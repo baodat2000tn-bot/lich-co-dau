@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lịch Cô Dâu">
+<meta name="theme-color" content="#2c1a0e">
+<title>💍 Lịch Cô Dâu</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Georgia',serif;background:linear-gradient(160deg,#fdf8f2,#f5ede0);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
+  button{font-family:'Georgia',serif;cursor:pointer}
+  input,textarea,select{font-family:'Georgia',serif}
+
+  /* Header */
+  #header{background:linear-gradient(135deg,#2c1a0e,#5c3317);color:#f5d9a0;padding:16px 18px 12px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(44,26,14,.3)}
+  #header h1{font-size:20px;font-weight:700;letter-spacing:.5px}
+  #header p{font-size:11px;color:#c9a96e;margin-top:2px;font-style:italic}
+  #header-row{display:flex;align-items:center;justify-content:space-between}
+  #badge-count{background:#e05c5c;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+  /* Nav */
+  #nav{display:flex;background:#3a2010;border-bottom:2px solid #c9a96e}
+  .nav-btn{flex:1;padding:11px 4px;background:transparent;color:#c9a96e;border:none;font-size:12px;font-weight:500;transition:all .2s}
+  .nav-btn.active{background:#c9a96e;color:#2c1a0e;font-weight:700}
+
+  /* Content */
+  #content{padding:16px 14px 90px}
+
+  /* Cards */
+  .card{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(92,51,23,.08);border:1px solid #eddcca;cursor:pointer}
+  .card-name{font-size:16px;font-weight:700;color:#2c1a0e;margin-bottom:2px}
+  .card-meta{font-size:12px;color:#8a6a4a;margin-bottom:3px}
+  .card-services{font-size:12px;color:#a07040;margin-top:4px}
+
+  /* Badges */
+  .badge{display:inline-block;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600}
+  .badge-confirmed{background:#fdf6e3;color:#d4a853;border:1px solid #d4a853}
+  .badge-pending{background:#f5f0f8;color:#9b8ea8;border:1px solid #9b8ea8}
+  .badge-done{background:#edf7f0;color:#6aaa82;border:1px solid #6aaa82}
+  .badge-cancelled{background:#fdf0f0;color:#c47a7a;border:1px solid #c47a7a}
+  .urgency-today{background:#e05c5c;color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
+  .urgency-soon{background:#e08c3a;color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
+  .urgency-week{background:#d4a853;color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;margin-left:6px}
+
+  /* Summary */
+  .summary-row{display:flex;gap:8px;margin-bottom:16px}
+  .summary-card{flex:1;background:#fff;border-radius:12px;padding:10px 8px;text-align:center;border:1px solid #eddcca}
+  .summary-num{font-size:22px;font-weight:700}
+  .summary-label{font-size:11px;color:#8a6a4a;margin-top:2px}
+
+  /* Filter */
+  .filter-row{display:flex;gap:8px;margin-bottom:10px}
+  .chip-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+  .chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ddd0c0;background:#fdf8f2;color:#8a6a4a;font-size:12px;cursor:pointer;white-space:nowrap}
+  .chip.active{border-color:#c9a96e;background:#fdf3e0;color:#a07040;font-weight:700}
+
+  /* Form */
+  .form-group{margin-bottom:16px}
+  label{font-size:12px;color:#8a6a4a;font-weight:600;display:block;margin-bottom:5px;letter-spacing:.3px}
+  input[type=text],input[type=tel],input[type=date],input[type=time],textarea,select{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #ddd0c0;font-size:15px;background:#fdf8f2;color:#2c1a0e;outline:none;appearance:none;-webkit-appearance:none}
+  textarea{resize:none;height:80px}
+  .row-2{display:flex;gap:10px}
+  .row-2>div{flex:1}
+  .service-chips{display:flex;flex-wrap:wrap;gap:8px}
+
+  /* Buttons */
+  .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#c9a96e,#a07040);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;letter-spacing:.5px}
+  .btn-secondary{width:100%;padding:12px;background:#fdf8f2;color:#8a6a4a;border:1.5px solid #ddd0c0;border-radius:12px;font-size:15px;margin-top:10px}
+  .btn-danger{width:100%;padding:12px;background:#fdf8f2;color:#c47a7a;border:1.5px solid #c47a7a;border-radius:12px;font-size:15px;margin-top:10px}
+  .btn-back{background:none;border:none;color:#c9a96e;font-size:14px;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:4px}
+  .btn-call{padding:5px 12px;border-radius:20px;border:1.5px solid #ddd0c0;background:#fdf8f2;color:#8a6a4a;font-size:11px;text-decoration:none;display:inline-block}
+  .btn-confirm{padding:5px 12px;border-radius:20px;border:1.5px solid #c9a96e;background:#fdf3e0;color:#a07040;font-size:11px;font-weight:700}
+  .action-row{display:flex;gap:8px;margin-top:8px}
+
+  /* FAB */
+  #fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#c9a96e,#a07040);color:#fff;font-size:30px;border:none;box-shadow:0 4px 18px rgba(160,112,64,.55);z-index:200;display:flex;align-items:center;justify-content:center;line-height:1}
+
+  /* Toast */
+  #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);border-radius:30px;padding:10px 24px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap;display:none}
+
+  /* Notif panel */
+  .notif-panel{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:16px;border:1px solid #eddcca;box-shadow:0 2px 12px rgba(92,51,23,.08)}
+  .notif-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .notif-title{font-size:15px;font-weight:700;color:#2c1a0e}
+  .notif-status{font-size:11px;border-radius:20px;padding:3px 10px;font-weight:700}
+  .toggle-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .toggle{width:50px;height:26px;border-radius:13px;border:none;cursor:pointer;position:relative;transition:background .3s}
+  .toggle-knob{position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .info-box{font-size:13px;color:#c47a7a;background:#fdf0f0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .desc-text{font-size:13px;color:#8a6a4a;margin-bottom:12px;line-height:1.7}
+  .section-title{font-size:13px;font-weight:700;color:#8a6a4a;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;margin-top:4px}
+
+  /* Detail */
+  .detail-box{background:#fff;border-radius:20px;padding:20px 18px;box-shadow:0 4px 20px rgba(92,51,23,.1);border:1px solid #eddcca}
+  .detail-date-box{background:#fdf8f2;border-radius:12px;padding:12px 16px;margin-bottom:14px}
+  .detail-name{font-size:22px;font-weight:700;color:#2c1a0e}
+
+  /* Empty */
+  .empty{text-align:center;color:#b8a090;padding:40px 20px;font-size:15px}
+  .empty-icon{font-size:40px;margin-bottom:10px}
+
+  /* Reminder border */
+  .remind-today{border-left:4px solid #e05c5c!important}
+  .remind-soon{border-left:4px solid #e08c3a!important}
+  .remind-week{border-left:4px solid #d4a853!important}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="header-row">
+    <div>
+      <h1>💍 Lịch Cô Dâu</h1>
+      <p>Quản lý lịch trang điểm &amp; áo cưới</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="notif-icon" style="font-size:18px;display:none">🔔</span>
+      <div id="badge-count" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="nav">
+  <button class="nav-btn active" onclick="showView('list')" id="nav-list">📋 Lịch hẹn</button>
+  <button class="nav-btn" onclick="showView('reminders')" id="nav-reminders">🔔 Nhắc nhở</button>
+</div>
+
+<div id="content"></div>
+
+<button id="fab" onclick="openNew()">+</button>
+<div id="toast"></div>
+
+<script>
+// ── Data ──
+var appointments = [];
+var notifEnabled = true;
+var notifiedIds = [];
+var notifLog = [];
+var currentView = 'list';
+var editingId = null;
+var selectedId = null;
+var filterStatus = 'all';
+var filterDate = '';
+var searchText = '';
+var checkTimer = null;
+
+var STATUS = {
+  confirmed:{label:'Đã xác nhận',cls:'badge-confirmed'},
+  pending:{label:'Chờ xác nhận',cls:'badge-pending'},
+  done:{label:'Hoàn thành',cls:'badge-done'},
+  cancelled:{label:'Đã huỷ',cls:'badge-cancelled'}
+};
+var SERVICES = ['Trang điểm cô dâu','Thuê áo cưới','Gói combo cô dâu','Trang điểm phụ dâu','Thuê áo phụ dâu'];
+
+// ── Storage ──
+function saveAll(){
+  try{localStorage.setItem('lich_co_dau',JSON.stringify(appointments));}catch(e){}
+  try{localStorage.setItem('notif_ids',JSON.stringify(notifiedIds));}catch(e){}
+  try{localStorage.setItem('notif_on',notifEnabled?'1':'0');}catch(e){}
+}
+function loadAll(){
+  try{var r=localStorage.getItem('lich_co_dau');if(r)appointments=JSON.parse(r);}catch(e){}
+  try{var r2=localStorage.getItem('notif_ids');if(r2)notifiedIds=JSON.parse(r2);}catch(e){}
+  try{var r3=localStorage.getItem('notif_on');if(r3!==null)notifEnabled=r3==='1';}catch(e){}
+}
+
+// ── Helpers ──
+function fmtDate(s){if(!s)return'';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function daysUntil(s){if(!s)return null;var t=new Date();t.setHours(0,0,0,0);var d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function urgencyHtml(dateStr){
+  var d=daysUntil(dateStr);
+  if(d===null||d<0)return'';
+  if(d===0)return'<span class="urgency-today">Hôm nay!</span>';
+  if(d<=2)return'<span class="urgency-soon">'+d+' ngày nữa</span>';
+  if(d<=7)return'<span class="urgency-week">'+d+' ngày nữa</span>';
+  return'';
+}
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── Toast ──
+function showToast(msg,type){
+  var el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=type==='error'?'#c47a7a':type==='info'?'#9b8ea8':'#6aaa82';
+  el.style.display='block';
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.style.display='none';},2500);
+}
+
+// ── Notifications ──
+function sendNotif(title,body,tag){
+  if(typeof Notification==='undefined'||Notification.permission!=='granted')return;
+  try{new Notification(title,{body:body,tag:tag,requireInteraction:true});}catch(e){}
+}
+function checkNotifications(){
+  if(!notifEnabled||typeof Notification==='undefined'||Notification.permission!=='granted')return;
+  var now=new Date();
+  appointments.forEach(function(a){
+    if(a.status==='cancelled'||a.status==='done')return;
+    var d=daysUntil(a.date);
+    if(d===1){
+      var tag='1day_'+a.id;
+      if(notifiedIds.indexOf(tag)<0){
+        sendNotif('💍 Nhắc lịch ngày mai!',a.name+' – '+a.time+' – '+fmtDate(a.date),tag);
+        notifiedIds.push(tag);saveAll();
+        notifLog.push({name:a.name,time:a.time,type:'1day'});
+      }
+    }
+    if(d===0&&now.getHours()>=6){
+      var tag2='today_'+a.id;
+      if(notifiedIds.indexOf(tag2)<0){
+        sendNotif('🌸 Hôm nay có lịch cô dâu!',a.name+' – '+a.time,tag2);
+        notifiedIds.push(tag2);saveAll();
+        notifLog.push({name:a.name,time:a.time,type:'today'});
+      }
+    }
+  });
+}
+function startNotifTimer(){
+  clearInterval(checkTimer);
+  checkNotifications();
+  checkTimer=setInterval(checkNotifications,60000);
+}
+
+// ── Views ──
+function showView(v){
+  currentView=v;
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('nav-'+v) && document.getElementById('nav-'+v).classList.add('active');
+  var fab=document.getElementById('fab');
+  fab.style.display=(v==='list'||v==='reminders')?'flex':'none';
+  var nav=document.getElementById('nav');
+  nav.style.display=(v==='form'||v==='detail')?'none':'flex';
+  renderContent();
+  updateHeaderBadge();
+}
+
+function updateHeaderBadge(){
+  var rem=getReminders();
+  var badge=document.getElementById('badge-count');
+  var icon=document.getElementById('notif-icon');
+  if(rem.length>0){badge.style.display='flex';badge.textContent=rem.length;}
+  else{badge.style.display='none';}
+  icon.style.display=(notifEnabled&&typeof Notification!=='undefined'&&Notification.permission==='granted')?'inline':'none';
+}
+
+function getReminders(){
+  return appointments.filter(function(a){
+    var d=daysUntil(a.date);
+    return d!==null&&d>=0&&d<=7&&a.status!=='cancelled'&&a.status!=='done';
+  }).sort(function(a,b){return a.date.localeCompare(b.date);});
+}
+
+function getFiltered(){
+  return appointments.filter(function(a){
+    if(filterStatus!=='all'&&a.status!==filterStatus)return false;
+    if(filterDate&&a.date!==filterDate)return false;
+    if(searchText&&a.name.toLowerCase().indexOf(searchText.toLowerCase())<0&&a.phone.indexOf(searchText)<0)return false;
+    return true;
+  }).sort(function(a,b){return(a.date+a.time).localeCompare(b.date+b.time);});
+}
+
+function renderContent(){
+  var el=document.getElementById('content');
+  if(currentView==='list')el.innerHTML=renderList();
+  else if(currentView==='reminders')el.innerHTML=renderReminders();
+  else if(currentView==='form')el.innerHTML=renderForm();
+  else if(currentView==='detail')el.innerHTML=renderDetail();
+}
+
+// ── List View ──
+function renderList(){
+  var today=todayStr();
+  var countToday=appointments.filter(function(a){return a.date===today&&a.status!=='cancelled';}).length;
+  var countUpcoming=appointments.filter(function(a){return a.date>=today&&a.status!=='cancelled'&&a.status!=='done';}).length;
+  var filtered=getFiltered();
+  var html='<div class="summary-row">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#d4a853">'+countToday+'</div><div class="summary-label">Hôm nay</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#9b8ea8">'+countUpcoming+'</div><div class="summary-label">Sắp tới</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#6aaa82">'+appointments.length+'</div><div class="summary-label">Tổng</div></div>';
+  html+='</div>';
+  html+='<div class="filter-row">';
+  html+='<input type="text" style="flex:2;padding:9px 12px;font-size:13px;border-radius:10px;border:1.5px solid #ddd0c0;background:#fdf8f2;outline:none;color:#2c1a0e" placeholder="🔍 Tìm tên / SĐT..." value="'+escHtml(searchText)+'" oninput="searchText=this.value;renderContent()">';
+  html+='<input type="date" style="flex:1;padding:9px 8px;font-size:12px;border-radius:10px;border:1.5px solid #ddd0c0;background:#fdf8f2;outline:none;color:#2c1a0e" value="'+filterDate+'" onchange="filterDate=this.value;renderContent()">';
+  html+='</div>';
+  html+='<div class="chip-row">';
+  var statuses=[['all','Tất cả'],['pending','Chờ xác nhận'],['confirmed','Đã xác nhận'],['done','Hoàn thành'],['cancelled','Đã huỷ']];
+  statuses.forEach(function(s){html+='<button class="chip'+(filterStatus===s[0]?' active':'')+'" onclick="filterStatus=\''+s[0]+'\';renderContent()">'+s[1]+'</button>';});
+  html+='</div>';
+  if(filtered.length===0){html+='<div class="empty"><div class="empty-icon">💐</div>Chưa có lịch hẹn nào</div>';}
+  else{filtered.forEach(function(a){html+=renderCard(a);});}
+  return html;
+}
+
+function renderCard(a){
+  var html='<div class="card" onclick="openDetail('+a.id+')">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start">';
+  html+='<div class="card-name">'+escHtml(a.name)+'</div>';
+  html+='<span class="badge '+(STATUS[a.status]||STATUS.pending).cls+'">'+((STATUS[a.status]||STATUS.pending).label)+'</span>';
+  html+='</div>';
+  html+='<div class="card-meta">📅 '+fmtDate(a.date)+' &nbsp;⏰ '+escHtml(a.time)+urgencyHtml(a.date)+'</div>';
+  if(a.phone)html+='<div class="card-meta">📞 '+escHtml(a.phone)+'</div>';
+  if(a.services&&a.services.length>0)html+='<div class="card-services">✨ '+a.services.map(escHtml).join(' · ')+'</div>';
+  html+='</div>';
+  return html;
+}
+
+// ── Reminders View ──
+function renderReminders(){
+  var rem=getReminders();
+  var perm=typeof Notification==='undefined'?'unsupported':Notification.permission;
+  var html='<div class="notif-panel">';
+  html+='<div class="notif-header"><div class="notif-title">🔔 Thông báo điện thoại</div>';
+  var scol=perm==='granted'?'#6aaa82':perm==='denied'?'#c47a7a':'#d4a853';
+  var slabel=perm==='unsupported'?'Không hỗ trợ':perm==='granted'?'Đã cấp quyền ✓':perm==='denied'?'Bị chặn ✗':'Chưa cấp quyền';
+  html+='<span class="notif-status" style="color:'+scol+';background:'+scol+'20">'+slabel+'</span></div>';
+  if(perm==='unsupported'){
+    html+='<div class="info-box">⚠️ Trình duyệt không hỗ trợ. Dùng Chrome hoặc Safari.</div>';
+  } else if(perm==='denied'){
+    html+='<div class="info-box">⚠️ Thông báo bị chặn.<br>Vào <b>Cài đặt trình duyệt → Thông báo</b> và cho phép trang này.</div>';
+  } else {
+    html+='<div class="desc-text">App tự động gửi thông báo:<br><b>• Trước 1 ngày:</b> nhắc chuẩn bị ngày mai<br><b>• Sáng ngày hẹn:</b> nhắc lịch hôm nay (từ 6h)</div>';
+    if(perm!=='granted'){
+      html+='<button class="btn-primary" onclick="doEnableNotif()">🔔 Bật thông báo ngay</button>';
+    } else {
+      html+='<div class="toggle-wrap"><span style="font-size:14px;color:#2c1a0e">Bật / tắt nhắc nhở</span>';
+      html+='<button class="toggle" style="background:'+(notifEnabled?'#6aaa82':'#ccc')+'" onclick="toggleNotif()">';
+      html+='<div class="toggle-knob" style="left:'+(notifEnabled?'26px':'3px')+'"></div></button></div>';
+      html+='<button class="btn-secondary" style="margin-top:0;font-size:13px" onclick="testNotif()">🧪 Gửi thông báo thử</button>';
+    }
+  }
+  if(notifLog.length>0){
+    html+='<div style="margin-top:14px"><div style="font-size:12px;font-weight:700;color:#8a6a4a;margin-bottom:6px">ĐÃ GỬI TRONG PHIÊN NÀY</div>';
+    var logs=notifLog.slice(-5).reverse();
+    logs.forEach(function(n){
+      html+='<div style="font-size:12px;color:#8a6a4a;padding:4px 0;border-bottom:1px solid #f0e8dc">'+(n.type==='1day'?'📅 Ngày mai':'🌸 Hôm nay')+': <b>'+escHtml(n.name)+'</b> – '+escHtml(n.time)+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div class="section-title">⏰ Lịch trong 7 ngày tới</div>';
+  if(rem.length===0){html+='<div class="empty"><div class="empty-icon">🌸</div>Không có lịch nào sắp tới!</div>';}
+  else{
+    rem.forEach(function(a){
+      var d=daysUntil(a.date);
+      var cls=d===0?'remind-today':d<=2?'remind-soon':'remind-week';
+      html+='<div class="card '+cls+'" onclick="openDetail('+a.id+')">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+      html+='<div class="card-name">'+escHtml(a.name)+'</div>'+urgencyHtml(a.date)+'</div>';
+      html+='<div class="card-meta">📅 '+fmtDate(a.date)+' &nbsp;⏰ '+escHtml(a.time)+'</div>';
+      if(a.phone)html+='<div class="card-meta">📞 '+escHtml(a.phone)+'</div>';
+      if(a.services&&a.services.length>0)html+='<div class="card-services">✨ '+a.services.map(escHtml).join(' · ')+'</div>';
+      html+='<div class="action-row">';
+      if(a.status!=='confirmed')html+='<button class="btn-confirm" onclick="event.stopPropagation();quickConfirm('+a.id+')">✓ Xác nhận</button>';
+      if(a.phone)html+='<a href="tel:'+escHtml(a.phone)+'" class="btn-call" onclick="event.stopPropagation()">📞 Gọi</a>';
+      html+='</div></div>';
+    });
+  }
+  return html;
+}
+
+// ── Form View ──
+function renderForm(){
+  var a=editingId?appointments.find(function(x){return x.id===editingId;})||{}:{};
+  var html='<button class="btn-back" onclick="showView(\'list\')">← Quay lại</button>';
+  html+='<div style="font-size:20px;font-weight:700;color:#2c1a0e;margin-bottom:20px">'+(editingId?'✏️ Chỉnh sửa lịch hẹn':'➕ Thêm lịch hẹn mới')+'</div>';
+  html+='<div class="form-group"><label>TÊN CÔ DÂU *</label><input type="text" id="f-name" placeholder="Nguyễn Thị Lan" value="'+escHtml(a.name||'')+'"></div>';
+  html+='<div class="form-group"><label>SỐ ĐIỆN THOẠI</label><input type="tel" id="f-phone" placeholder="0912 345 678" value="'+escHtml(a.phone||'')+'"></div>';
+  html+='<div class="row-2" style="margin-bottom:16px">';
+  html+='<div><label>NGÀY HẸN *</label><input type="date" id="f-date" value="'+(a.date||'')+'"></div>';
+  html+='<div><label>GIỜ HẸN *</label><input type="time" id="f-time" value="'+(a.time||'')+'"></div>';
+  html+='</div>';
+  html+='<div class="form-group"><label>DỊCH VỤ</label><div class="service-chips" id="svc-chips">';
+  SERVICES.forEach(function(s){
+    var sel=a.services&&a.services.indexOf(s)>=0;
+    html+='<button class="chip'+(sel?' active':'')+'" onclick="toggleSvc(this,\''+escHtml(s)+'\')">'+escHtml(s)+'</button>';
+  });
+  html+='</div></div>';
+  html+='<div class="form-group"><label>TRẠNG THÁI</label><div class="service-chips">';
+  Object.keys(STATUS).forEach(function(k){
+    var sel=(a.status||'pending')===k;
+    html+='<button class="chip'+(sel?' active':'')+'" onclick="selectStatus(this,\''+k+'\')">'+STATUS[k].label+'</button>';
+  });
+  html+='</div></div>';
+  html+='<div class="form-group"><label>GHI CHÚ</label><textarea id="f-note" placeholder="Ghi chú thêm...">'+escHtml(a.note||'')+'</textarea></div>';
+  html+='<button class="btn-primary" onclick="saveForm()">'+(editingId?'💾 Lưu thay đổi':'✓ Thêm lịch hẹn')+'</button>';
+  html+='<button class="btn-secondary" onclick="showView(\'list\')">Huỷ</button>';
+  return html;
+}
+
+var _selectedSvcs=[];
+var _selectedStatus='pending';
+function toggleSvc(btn,s){
+  btn.classList.toggle('active');
+  var i=_selectedSvcs.indexOf(s);
+  if(i<0)_selectedSvcs.push(s);else _selectedSvcs.splice(i,1);
+}
+function selectStatus(btn,s){
+  _selectedStatus=s;
+  document.querySelectorAll('#content .service-chips .chip').forEach(function(b){
+    if(['Đã xác nhận','Chờ xác nhận','Hoàn thành','Đã huỷ'].indexOf(b.textContent)>=0)b.classList.remove('active');
+  });
+  btn.classList.add('active');
+}
+
+// ── Detail View ──
+function renderDetail(){
+  var a=appointments.find(function(x){return x.id===selectedId;});
+  if(!a)return'';
+  var html='<button class="btn-back" onclick="showView(\'list\')">← Quay lại</button>';
+  html+='<div class="detail-box">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">';
+  html+='<div><div class="detail-name">'+escHtml(a.name)+'</div>'+(a.phone?'<div style="font-size:14px;color:#8a6a4a;margin-top:4px">📞 '+escHtml(a.phone)+'</div>':'')+'</div>';
+  html+='<span class="badge '+(STATUS[a.status]||STATUS.pending).cls+'">'+(STATUS[a.status]||STATUS.pending).label+'</span></div>';
+  html+='<div class="detail-date-box"><div style="font-size:15px;color:#2c1a0e;font-weight:600">📅 '+fmtDate(a.date)+' &nbsp;⏰ '+escHtml(a.time)+'</div>'+urgencyHtml(a.date)+'</div>';
+  if(a.services&&a.services.length>0){html+='<div style="margin-bottom:14px"><div style="font-size:12px;color:#8a6a4a;font-weight:600;margin-bottom:6px">DỊCH VỤ</div><div style="display:flex;flex-wrap:wrap;gap:6px">';a.services.forEach(function(s){html+='<span class="chip active" style="cursor:default">'+escHtml(s)+'</span>';});html+='</div></div>';}
+  if(a.note){html+='<div style="margin-bottom:14px"><div style="font-size:12px;color:#8a6a4a;font-weight:600;margin-bottom:5px">GHI CHÚ</div><div style="font-size:14px;color:#5c3317;background:#fdf8f2;border-radius:10px;padding:10px 14px">'+escHtml(a.note)+'</div></div>';}
+  html+='<div style="margin-bottom:16px"><div style="font-size:12px;color:#8a6a4a;font-weight:600;margin-bottom:8px">CẬP NHẬT TRẠNG THÁI</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
+  Object.keys(STATUS).forEach(function(k){html+='<button class="chip'+(a.status===k?' active':'')+'" onclick="setStatus('+a.id+',\''+k+'\')">'+STATUS[k].label+'</button>';});
+  html+='</div></div>';
+  html+='<div style="display:flex;gap:8px">';
+  html+='<button class="btn-primary" style="flex:2" onclick="openEdit('+a.id+')">✏️ Chỉnh sửa</button>';
+  if(a.phone)html+='<a href="tel:'+escHtml(a.phone)+'" class="btn-primary" style="flex:1;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">📞</a>';
+  html+='</div>';
+  html+='<button class="btn-danger" onclick="deleteAppt('+a.id+')">🗑 Xoá lịch hẹn</button>';
+  html+='</div>';
+  return html;
+}
+
+// ── Actions ──
+function openNew(){
+  editingId=null;
+  _selectedSvcs=[];
+  _selectedStatus='pending';
+  currentView='form';
+  document.getElementById('nav').style.display='none';
+  document.getElementById('fab').style.display='none';
+  renderContent();
+}
+function openEdit(id){
+  editingId=id;
+  var a=appointments.find(function(x){return x.id===id;})||{};
+  _selectedSvcs=(a.services||[]).slice();
+  _selectedStatus=a.status||'pending';
+  currentView='form';
+  document.getElementById('nav').style.display='none';
+  document.getElementById('fab').style.display='none';
+  renderContent();
+}
+function openDetail(id){
+  selectedId=id;
+  currentView='detail';
+  document.getElementById('nav').style.display='none';
+  document.getElementById('fab').style.display='none';
+  renderContent();
+}
+function saveForm(){
+  var name=document.getElementById('f-name').value.trim();
+  var phone=document.getElementById('f-phone').value.trim();
+  var date=document.getElementById('f-date').value;
+  var time=document.getElementById('f-time').value;
+  var note=document.getElementById('f-note').value.trim();
+  if(!name||!date||!time){showToast('Vui lòng điền đầy đủ tên, ngày và giờ!','error');return;}
+  // collect services from active chips
+  var svcs=[];
+  document.querySelectorAll('#svc-chips .chip.active').forEach(function(b){svcs.push(b.textContent);});
+  if(editingId){
+    var idx=appointments.findIndex(function(a){return a.id===editingId;});
+    if(idx>=0)appointments[idx]={id:editingId,name:name,phone:phone,date:date,time:time,services:svcs,status:_selectedStatus,note:note};
+    showToast('Đã cập nhật lịch hẹn!');
+  } else {
+    appointments.push({id:Date.now(),name:name,phone:phone,date:date,time:time,services:svcs,status:_selectedStatus,note:note});
+    showToast('Đã thêm lịch hẹn mới!');
+  }
+  saveAll();
+  showView('list');
+}
+function deleteAppt(id){
+  if(!confirm('Xoá lịch hẹn này?'))return;
+  appointments=appointments.filter(function(a){return a.id!==id;});
+  saveAll();
+  showToast('Đã xoá.','info');
+  showView('list');
+}
+function setStatus(id,status){
+  var a=appointments.find(function(x){return x.id===id;});
+  if(a){a.status=status;saveAll();showToast('Đã cập nhật trạng thái!');}
+  renderContent();
+}
+function quickConfirm(id){setStatus(id,'confirmed');}
+
+// ── Notifications ──
+function doEnableNotif(){
+  if(typeof Notification==='undefined'){showToast('Trình duyệt không hỗ trợ','error');return;}
+  Notification.requestPermission().then(function(r){
+    if(r==='granted'){notifEnabled=true;saveAll();showToast('✅ Đã bật thông báo!');startNotifTimer();}
+    else{showToast('Bị từ chối. Kiểm tra cài đặt trình duyệt.','error');}
+    renderContent();updateHeaderBadge();
+  });
+}
+function toggleNotif(){
+  notifEnabled=!notifEnabled;
+  saveAll();
+  showToast(notifEnabled?'Đã bật thông báo':'Đã tắt thông báo');
+  renderContent();updateHeaderBadge();
+}
+function testNotif(){
+  if(typeof Notification==='undefined'||Notification.permission!=='granted'){showToast('Chưa bật thông báo','error');return;}
+  try{new Notification('💍 Thông báo thử – Lịch Cô Dâu',{body:'Nếu thấy tin này, tính năng đang hoạt động! 🌸',tag:'test_'+Date.now(),requireInteraction:true});}catch(e){}
+  showToast('Đã gửi thông báo thử!');
+}
+
+// ── Init ──
+loadAll();
+showView('list');
+startNotifTimer();
+</script>
+</body>
+</html>
